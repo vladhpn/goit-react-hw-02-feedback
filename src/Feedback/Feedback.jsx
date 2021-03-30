@@ -1,37 +1,57 @@
 import React, {Component} from 'react';
+import Controls from './Controls';
+import Statistics from './Statistics';
+import 'modern-normalize/modern-normalize.css';
+
+
 
 class Feedback extends Component {
-    btnTypeGood = event =>{
-        console.log('good')
-        const {target} = event;
-    }
 
-    btnTypeNeutral = () =>{
-        console.log('Neutral')
-    }
+    state = {
+        good: 0,
+        neutral: 0,
+        bad: 0,   
+    };
 
-    btnTypeBad = () =>{
-        console.log('bad')
-    }
+    onLeaveFeedback = ({target}) => {
+		const type = target.dataset.action;
+		this.setState((prevState) => ({
+			[type]: prevState[type] + 1
+		}));
+	};
 
+
+    totalQuantityOfFeedbacks = () => {
+        const { good, neutral, bad } = this.state;
     
+       return good + neutral + bad;
+        
+      };
 
+      countPositiveFeedbackPercentage = () => {
+        const {good} = this.state;
+        const total = this.totalQuantityOfFeedbacks();
+        if (total) {
+            return `${Math.round((good / total) * 100)}%`;
+          }
+          return '0%';
+      }
+    
     render() {
+       
+        const options = ['good', 'neutral', 'bad'];
+        const {good, neutral, bad} = this.state;
+        const total = this.totalQuantityOfFeedbacks();
+        const positiveFeedback = this.countPositiveFeedbackPercentage();
+
         return (<>
-        <h1>Please leave feedback</h1>
-            <div>
-                <button type="button" onClick={this.btnTypeGood}>Good</button>
-                <button type="button" onClick={this.btnTypeNeutral}>Neutral</button>
-                <button type="button" onClick={this.btnTypeBad}>Bad</button>
-            </div>
-            <h2>Statistics</h2>
-            <ul>
-                <li>Good:</li>
-                <li>Neutral:</li>
-                <li>Bad:</li>
-                <li>Total:</li>
-                <li>Positive Feedback:</li>
-            </ul>
+      
+
+        <Controls options={options} onLeaveFeedback={this.onLeaveFeedback} />
+
+        <Statistics good={good} neutral={neutral} bad={bad}
+            total={total} positiveFeedback={positiveFeedback}/>
+        
             </>)
     }
 }
